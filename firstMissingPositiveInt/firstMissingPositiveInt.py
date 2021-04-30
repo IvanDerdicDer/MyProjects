@@ -22,11 +22,12 @@ def firstMissingPositive(arr: list):
 
     return smallestPositiveInt + 1
 
-useArr = inputArray.copy()
-print("Starting...")
-startTimeMs = thread_time()
-result = firstMissingPositive(useArr)
-endTimeMs = thread_time()
-print(f"Result: {result} Runtime: {endTimeMs - startTimeMs} s")
-#print(f"InputArray : {inputArray}")
-#print(f"UsedArray: {useArr}")
+if __name__ == '__main__':
+    useArr = inputArray.copy()
+    print("Starting...")
+    startTimeMs = thread_time()
+    result = firstMissingPositive(useArr)
+    endTimeMs = thread_time()
+    print(f"Result: {result} Runtime: {endTimeMs - startTimeMs} s")
+    #print(f"InputArray : {inputArray}")
+    #print(f"UsedArray: {useArr}")
