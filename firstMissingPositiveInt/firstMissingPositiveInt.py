@@ -20,6 +20,7 @@ def firstMissingPositive(arr: list):
     return smallestPositiveInt + 1
 
 useArr = inputArray.copy()
+print("Starting...")
 startTimeMs = thread_time()
 result = firstMissingPositive(useArr)
 endTimeMs = thread_time()
