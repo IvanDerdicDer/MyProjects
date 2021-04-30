@@ -2,8 +2,8 @@ from bisect import bisect_right
 from random import randint
 from time import time
 
-inputArray = [randint(-1000000, 1000000) for _ in range(1000000000)]
-#inputArray = [1, 5, -2, 6, -3, 9, 12, -63, 83]
+#inputArray = [randint(-1000000, 1000000) for _ in range(10000000)]
+inputArray = [1, 5, -2, 6, -3, 9, 12, -63, 83]
 
 def firstMissingPositive(arr: list):
     #This lambda ensures that only positive ints are considered
@@ -24,5 +24,5 @@ startTimeMs = time()
 result = firstMissingPositive(useArr)
 endTimeMs = time()
 print(f"Result: {result} Runtime: {endTimeMs - startTimeMs} ms")
-#print(f"InputArray : {inputArray}")
-#print(f"UsedArray: {useArr}")
+print(f"InputArray : {inputArray}")
+print(f"UsedArray: {useArr}")
