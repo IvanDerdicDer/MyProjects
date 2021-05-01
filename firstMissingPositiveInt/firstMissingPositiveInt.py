@@ -7,9 +7,9 @@ inputArray = [randint(-1000000, 1000000) for _ in range(1000000)]
 #inputArray = [1, 1, 1,-4,-5,-1,-8,-12]
 
 def firstMissingPositive(arr: list):
-    #Array needs to be sorted for bisect
     if 1 not in arr:
         return 1
+    #Array needs to be sorted for bisect
     arr.sort()
     #This lambda ensures that only positive ints are considered
     smallestPositiveInt = 1
