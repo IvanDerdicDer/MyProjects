@@ -37,4 +37,4 @@ if __name__ == '__main__':
         endTimeMs = thread_time()
         listOfTimes.append(endTimeMs-startTimeMs)
 
-    print(f"Average time: {sum(listOfTimes)/len(listOfTimes)}")
+    print(f"Average time: {sum(listOfTimes)/len(listOfTimes)} s")
