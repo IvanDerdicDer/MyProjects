@@ -38,12 +38,11 @@ def eratosthenesSieve(arr: list):
 
 if __name__ == '__main__':
     n = 1000
-    listOfNumbers = [i for i in range(3, n, 2)]
+    listOfNumbers = [2]+[i for i in range(3, n, 2)]
     listToUse = listOfNumbers.copy()
     numberOfPrimes = 1
 
     primes = eratosthenesSieve(listToUse)
-    primes.insert(0, 2)
 
     print(f"ListOfNumbers: {primes}\nlen: {len(primes)}\nallPrimes: {allPrimes(primes)}")
 
