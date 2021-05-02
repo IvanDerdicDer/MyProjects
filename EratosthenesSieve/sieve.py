@@ -27,25 +27,23 @@ def isPrime2(n: int, arr: list):
     return True
 
 def eratosthenesSieve(arr: list, n):
-    i = 0
     length = sqrt(n)
-    while i < length:
+    for i in range(int(length)):
         for j in arr:
             if j%arr[i] == 0 and j != arr[i]:
                 arr.remove(j)
-
-        i += 1
     return arr
 
 if __name__ == '__main__':
-    n = 10000
+    n = 1000
     listOfNumbers = [2]+[i for i in range(3, n, 2)]
     listToUse = listOfNumbers.copy()
     numberOfPrimes = 1
 
     primes = eratosthenesSieve(listToUse, n)
 
-    print(f"ListOfNumbers: {primes}\nlen: {len(primes)}\nallPrimes: {allPrimes(primes)}")
+    #print(f"ListOfNumbers: {primes}\nlen: {len(primes)}\nallPrimes: {allPrimes(primes)}")
+    print(f"ListOfNumbers: {primes}\nlen: {len(primes)}")
 
     startTime = thread_time()
     numberOfPasses = 0
