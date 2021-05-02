@@ -59,7 +59,7 @@ if __name__ == '__main__':
         numberOfPasses += 1
         endTime = thread_time()
 
-    print(f"NumberOfPasses: {numberOfPasses} Runtime: {endTime-startTime}")
+    print(f"NumberOfPasses: {numberOfPasses} Runtime: {endTime-startTime}\n")
 
     primes = eratosthenesSieve2(listOfNumbers)
 
