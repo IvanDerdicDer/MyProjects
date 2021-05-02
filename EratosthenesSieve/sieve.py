@@ -34,23 +34,45 @@ def eratosthenesSieve(arr: list, n):
                 arr.remove(j)
     return arr
 
+def eratosthenesSieve2(arr: list):
+    primes = []
+    for j in arr:
+        if isPrime2(j, primes):
+            primes.append(j)
+    return primes
+
 if __name__ == '__main__':
     n = 1000
-    listOfNumbers = [2]+[i for i in range(3, n, 2)]
-    listToUse = listOfNumbers.copy()
+    listOfNumbers = [2]+ list(range(3, n, 2))
 
-    primes = eratosthenesSieve(listToUse, n)
+    primes = eratosthenesSieve(listOfNumbers.copy(), n)
 
     #print(f"ListOfNumbers: {primes}\nlen: {len(primes)}\nallPrimes: {allPrimes(primes)}")
     print(f"ListOfNumbers: {primes}\nlen: {len(primes)}")
 
+    print(f"Starting 1")
     startTime = thread_time()
     numberOfPasses = 0
     endTime = thread_time()
     while endTime - startTime < 5:
-        eratosthenesSieve(listToUse, n)
+        eratosthenesSieve(listOfNumbers.copy(), n)
         numberOfPasses += 1
         endTime = thread_time()
 
     print(f"NumberOfPasses: {numberOfPasses} Runtime: {endTime-startTime}")
+
+    primes = eratosthenesSieve2(listOfNumbers)
+
+    print(f"ListOfNumbers: {primes}\nlen: {len(primes)}")
+
+    print(f"Starting 2")
+    startTime = thread_time()
+    numberOfPasses = 0
+    endTime = thread_time()
+    while endTime - startTime < 5:
+        eratosthenesSieve2(listOfNumbers)
+        numberOfPasses += 1
+        endTime = thread_time()
+
+    print(f"NumberOfPasses: {numberOfPasses} Runtime: {endTime - startTime}")
 
