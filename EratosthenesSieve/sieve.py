@@ -1,5 +1,6 @@
-from time import  thread_time
-from math import sqrt
+import ctypes
+from time import thread_time
+from math import sqrt,ceil
 
 def isPrime(n):
     if n == 1:
@@ -41,6 +42,29 @@ def eratosthenesSieve2(arr: list):
             primes.append(j)
     return primes
 
+def eratosthenesSieve3(n):
+    if n <= 2:
+        return []
+    isPrime = [False] * 2  + [True] * (n - 2)
+    for i in range(2, ceil(sqrt(n))):
+        if isPrime[i]:
+            for j in range(i*i, n, i):
+                isPrime[j] = False
+
+    return [i for i in range(n) if isPrime[i]]
+
+def eratosthenesSieve4(n):
+    if n <= 2:
+        return []
+    isPrime = -1
+    isPrime &= -1^3
+    for i in range(2, ceil(sqrt(n))):
+        if isPrime & 1<<i:
+            for j in range(i*i, n, i):
+                isPrime &= -1^(1<<j)
+
+    return [i for i in range(n) if isPrime & 1<<i]
+
 if __name__ == '__main__':
     n = 1000
     listOfNumbers = [2]+ list(range(3, n, 2))
@@ -71,6 +95,36 @@ if __name__ == '__main__':
     endTime = thread_time()
     while endTime - startTime < 5:
         eratosthenesSieve2(listOfNumbers)
+        numberOfPasses += 1
+        endTime = thread_time()
+
+    print(f"NumberOfPasses: {numberOfPasses} Runtime: {endTime - startTime}")
+
+    primes = eratosthenesSieve3(n)
+
+    print(f"ListOfNumbers: {primes}\nlen: {len(primes)}")
+
+    print(f"Starting 3")
+    startTime = thread_time()
+    numberOfPasses = 0
+    endTime = thread_time()
+    while endTime - startTime < 5:
+        eratosthenesSieve3(n)
+        numberOfPasses += 1
+        endTime = thread_time()
+
+    print(f"NumberOfPasses: {numberOfPasses} Runtime: {endTime - startTime}")
+
+    primes = eratosthenesSieve4(n)
+
+    print(f"ListOfNumbers: {primes}\nlen: {len(primes)}")
+
+    print(f"Starting 4")
+    startTime = thread_time()
+    numberOfPasses = 0
+    endTime = thread_time()
+    while endTime - startTime < 5:
+        eratosthenesSieve4(n)
         numberOfPasses += 1
         endTime = thread_time()
 

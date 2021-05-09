@@ -1,10 +1,28 @@
 from bisect import bisect_right
 from random import randint
 from time import thread_time
+from math import ceil
 
 inputArray = [randint(-1000000, 1000000) for _ in range(1000000)]
 #inputArray = [1, 5, -2, 6, -3, 9, 12, -63, 83]
 #inputArray = [1, 1, 1,-4,-5,-1,-8,-12]
+
+def bucketSort(arr):
+    numberOfElements = int(ceil(max(arr)/256))
+    bucket = {}
+    l = [0]*numberOfElements if numberOfElements else [0]
+    for i in arr:
+        if i > 0:
+            if i not in bucket.keys():
+                bucket[i] = 0
+                l[i%numberOfElements] |= 1 << (i%numberOfElements)%256
+            bucket[i] += 1
+    outList = []
+    for i in l:
+        for j in range(256):
+            if i & (1 << j):
+                outList += [i * 256 + j] * bucket[i * 256 + j]
+
 
 def firstMissingPositive(arr: list):
     if 1 not in arr:
