@@ -1,4 +1,3 @@
-import ctypes
 from time import thread_time
 from math import sqrt,ceil
 
