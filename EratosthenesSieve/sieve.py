@@ -69,11 +69,12 @@ def eratosthenesSieve5(n):
     if n <= 2:
         return []
     listOfNumbers = range(3, n, 2)
+    lengthOfNumbers = len(listOfNumbers)
     isPrime = [True] * len(listOfNumbers)
     for i in range(ceil(sqrt(len(listOfNumbers)))):
-        if isPrime[i]:
-            prime = listOfNumbers[i]
-            for j in range(listOfNumbers.index(prime * prime) if prime*prime in listOfNumbers else len(listOfNumbers), len(listOfNumbers), prime):
+        prime = listOfNumbers[i]
+        if isPrime[i] and prime*prime in listOfNumbers:
+            for j in range(listOfNumbers.index(prime * prime), lengthOfNumbers, prime):
                 isPrime[j] = False
 
     return [2] + [listOfNumbers[i] for i in range(len(listOfNumbers)) if isPrime[i]]
