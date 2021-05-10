@@ -65,6 +65,20 @@ def eratosthenesSieve4(n):
 
     return [i for i in range(n) if isPrime & 1<<i]
 
+def eratosthenesSieve5(n):
+    if n <= 2:
+        return []
+    listOfNumbers = range(3, n, 2)
+    isPrime = [True] * len(listOfNumbers)
+    for i in range(ceil(sqrt(len(listOfNumbers)))):
+        if isPrime[i]:
+            #print(f"{listOfNumbers.index(i*i)} {len(listOfNumbers)} {listOfNumbers[i]}")
+            prime = listOfNumbers[i]
+            for j in range(listOfNumbers.index(prime * prime) if prime*prime in listOfNumbers else len(listOfNumbers), len(listOfNumbers), prime):
+                isPrime[j] = False
+
+    return [2] + [listOfNumbers[i] for i in range(len(listOfNumbers)) if isPrime[i]]
+
 if __name__ == '__main__':
     n = 1000
     listOfNumbers = [2]+ list(range(3, n, 2))
@@ -98,7 +112,7 @@ if __name__ == '__main__':
         numberOfPasses += 1
         endTime = thread_time()
 
-    print(f"NumberOfPasses: {numberOfPasses} Runtime: {endTime - startTime}")
+    print(f"NumberOfPasses: {numberOfPasses} Runtime: {endTime - startTime}\n")
 
     primes = eratosthenesSieve3(n)
 
@@ -113,7 +127,7 @@ if __name__ == '__main__':
         numberOfPasses += 1
         endTime = thread_time()
 
-    print(f"NumberOfPasses: {numberOfPasses} Runtime: {endTime - startTime}")
+    print(f"NumberOfPasses: {numberOfPasses} Runtime: {endTime - startTime}\n")
 
     primes = eratosthenesSieve4(n)
 
@@ -128,5 +142,20 @@ if __name__ == '__main__':
         numberOfPasses += 1
         endTime = thread_time()
 
-    print(f"NumberOfPasses: {numberOfPasses} Runtime: {endTime - startTime}")
+    print(f"NumberOfPasses: {numberOfPasses} Runtime: {endTime - startTime}\n")
+
+    primes = eratosthenesSieve5(n)
+
+    print(f"ListOfNumbers: {primes}\nlen: {len(primes)}")
+
+    print(f"Starting 5")
+    startTime = thread_time()
+    numberOfPasses = 0
+    endTime = thread_time()
+    while endTime - startTime < 5:
+        eratosthenesSieve5(n)
+        numberOfPasses += 1
+        endTime = thread_time()
+
+    print(f"NumberOfPasses: {numberOfPasses} Runtime: {endTime - startTime}\n")
 
