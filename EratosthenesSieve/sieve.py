@@ -72,7 +72,6 @@ def eratosthenesSieve5(n):
     isPrime = [True] * len(listOfNumbers)
     for i in range(ceil(sqrt(len(listOfNumbers)))):
         if isPrime[i]:
-            #print(f"{listOfNumbers.index(i*i)} {len(listOfNumbers)} {listOfNumbers[i]}")
             prime = listOfNumbers[i]
             for j in range(listOfNumbers.index(prime * prime) if prime*prime in listOfNumbers else len(listOfNumbers), len(listOfNumbers), prime):
                 isPrime[j] = False
