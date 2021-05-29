@@ -3,4 +3,4 @@ This app only works for Windows platform.
 Shortcut to backroundChanger.pyw should be placed in Windows Startup folder for it to run on boot.
 
 If you want to use different wallpapers just place/remove necessary wallpapers in the "wallpapers" folder,
-the program does the rest.
+the program does the rest. Restarting the app is needed!!!
