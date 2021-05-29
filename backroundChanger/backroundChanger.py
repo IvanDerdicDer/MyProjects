@@ -2,7 +2,7 @@ import ctypes
 import os
 from datetime import timedelta
 from time import time, sleep
-from threading import Thread
+#from threading import Thread
 
 
 def splitDayIntoParts(n: int) -> list[timedelta]:
@@ -56,7 +56,7 @@ if __name__ == '__main__':
     #In the future should be changed trough a GUI to select wallpaper batch
     relativePath = "wallpapers"
 
-    pathToWallpaper, dayIntervals = initialiseRelevantVariables()
+    pathToWallpaper, dayIntervals = initialiseRelevantVariables(relativePath)
 
     #Should be run in a new thread when GUI is implemented
     #wallpaperLoopThread = Thread(target=wallpaperChangingLoop, args=(pathToWallpaper, dayIntervals))
