@@ -1,3 +1,5 @@
+Number of wallpapers for one set is expected to be EVEN!
+
 This app only works for Windows platform.
 
 Shortcut to backroundChanger.pyw should be placed in Windows Startup folder for it to run on boot.
