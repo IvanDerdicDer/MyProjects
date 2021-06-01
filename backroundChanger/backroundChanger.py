@@ -112,7 +112,7 @@ def initialiseRelevantVariables(relativePath: str) -> tuple[list[str], list[time
     return pathToWallpaper, dayIntervals
 
 def wallpaperChangingLoop():
-    previousIndex = 0
+    previousIndex = -1
     while True:
         print("Entered loop")
         currentTime = getCurrentTime()
