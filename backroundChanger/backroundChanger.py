@@ -105,6 +105,7 @@ def sortWallpapers(l: list[str]) -> list[str]:
     indexList = [int(i.split("_")[-1].split(".")[0]) for i in l]
     indexList.sort()
     sortedList = []
+    #Yes its O(n^2), deal with it
     for i in indexList:
         for j in l:
             if i == int(j.split("_")[-1].split(".")[0]):
@@ -130,7 +131,7 @@ def wallpaperChangingLoop():
         currentTime = getCurrentTime()
         currentIndex = chooseWallpaper(dayIntervals, currentTime)
         print(f"currentTime: {currentTime}, currentIndex: {currentIndex}, previousIndex: {previousIndex}")
-        # Makes sure wallpaper isn't changed constantly
+        #Makes sure wallpaper isn't changed constantly
         if currentIndex != previousIndex:
             changeWallpaper(pathToWallpaper[currentIndex])
             print("Wallpaper changed")
