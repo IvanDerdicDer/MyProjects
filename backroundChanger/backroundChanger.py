@@ -1,7 +1,7 @@
 import ctypes
 import os
 from datetime import timedelta, datetime
-from time import time, sleep
+from time import sleep, localtime
 import math
 #from threading import Thread
 
@@ -73,8 +73,8 @@ def changeWallpaper(pathToWallpaper: str):
     ctypes.windll.user32.SystemParametersInfoW(20, 0, pathToWallpaper, 0)
 
 def getCurrentTime() -> timedelta:
-    timeToReturn = time()
-    timeToReturn = timedelta(seconds=(timeToReturn - timedelta(seconds=timeToReturn).days*24*60*60))
+    timeToReturn = localtime()
+    timeToReturn = timedelta(seconds=(timeToReturn.tm_hour * 60 + timeToReturn.tm_min) * 60 + timeToReturn.tm_sec)
     return timeToReturn
 
 def calculateDaytime(lat: float, long: float) -> tuple[timedelta, timedelta]:
@@ -101,12 +101,24 @@ def chooseWallpaper(dayIntervals: list[timedelta], currentTime:timedelta) -> int
         if currentTime < intervalStart:
             return dayIntervals.index(intervalStart)
 
+def sortWallpapers(l: list[str]) -> list[str]:
+    indexList = [int(i.split("_")[-1].split(".")[0]) for i in l]
+    indexList.sort()
+    sortedList = []
+    for i in indexList:
+        for j in l:
+            if i == int(j.split("_")[-1].split(".")[0]):
+                sortedList.append(j)
+                break
+    return sortedList
+
 def initialiseRelevantVariables(relativePath: str) -> tuple[list[str], list[timedelta]]:
     #Converts relative path to absolute path
     pathToWallpapers = os.path.abspath(relativePath)
     wallpapersIterator = os.scandir(pathToWallpapers)
     #List of absolute paths for each wallpaper
     pathToWallpaper = [i.path for i in wallpapersIterator]
+    pathToWallpaper = sortWallpapers(pathToWallpaper)
     dayIntervals = splitDayIntoParts(len(pathToWallpaper))
 
     return pathToWallpaper, dayIntervals
