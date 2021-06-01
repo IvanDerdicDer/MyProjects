@@ -1,39 +1,10 @@
 import ctypes
 import os
-from datetime import timedelta, datetime
-from time import sleep, localtime
+from datetime import timedelta, date
+from time import sleep, localtime, timezone, altzone
 import math
+from astral import Astral
 #from threading import Thread
-
-#---
-#Src: https://stackoverflow.com/questions/31142181/calculating-julian-date-in-python
-def getJulianDatetime(date: datetime) -> float:
-    """
-    Convert a datetime object into julian float.
-    Args:
-        date: datetime-object of date in question
-
-    Returns: float - Julian calculated datetime.
-    Raises:
-        TypeError : Incorrect parameter type
-        ValueError: Date out of range of equation
-    """
-
-    # Ensure correct format
-    if not isinstance(date, datetime):
-        raise TypeError('Invalid type for parameter "date" - expecting datetime')
-    elif not(1801 <= date.year <= 2099):
-        raise ValueError('Datetime must be between year 1801 and 2099')
-
-    # Perform the calculation
-    julianDatetime = 367 * date.year - int((7 * (date.year + int((date.month + 9) / 12.0))) / 4.0) + \
-                     int((275 * date.month) / 9.0) + \
-                     date.day + 1721013.5 + \
-                     (date.hour + date.minute / 60.0 + date.second / math.pow(60, 2)) / 24.0 - \
-                     0.5 * math.copysign(1, 100 * date.year + date.month - 190002.5) + 0.5
-
-    return julianDatetime
-#---
 
 def splitDayIntoParts(n: int) -> list[timedelta]:
     sunrise, sunset = calculateDaytime(latitude, longitude)
@@ -78,21 +49,16 @@ def getCurrentTime() -> timedelta:
     return timeToReturn
 
 def calculateDaytime(lat: float, long: float) -> tuple[timedelta, timedelta]:
-    julianDate = getJulianDatetime(datetime.today())
-    n = julianDate - 2451545 + 0.0008 #Julian day
-    jStar = n - long/360 #Mean solar time
-    m = (357.5291 + 0.98560028 * jStar) % 360 #Solar mean anomaly
-    c = 1.9148 * math.sin(m) + 0.0200 * math.sin(2 * m) + 0.0003 * math.sin(3 * m) #Equation of the center
-    lam = (m + c + 180 + 102.9372)%360 #Ecliptic longitude
-    jTransit = 2451545 + jStar + 0.0053 * math.sin(m) - 0.0069 * math.sin(2 * lam) #Solar transit
-    delta = math.asin(math.sin(lam) * math.sin(23.44)) #Declination of the Sun
-    omega = math.acos((math.sin(-0.83) - math.sin(lat) * math.sin(delta)) / (math.cos(lat) * math.cos(delta))) #Hour angle
-    jRise = jTransit - omega/360 #Julian date of sunrise
-    jSet = jTransit + (omega + 180)/360 #Julian date of sundown
+    timeZoneLocal = timezone if localtime().tm_isdst == 0 else altzone
+    timeZoneLocal *= -1
 
-    sunriseInSecs = (jRise - int(jRise)) * (24 * 60 * 60)
+    sunriseInSecs = Astral().sunrise_utc(date.today(), lat, long)
+    sunriseInSecs = (sunriseInSecs.hour * 60 + sunriseInSecs.minute) * 60 + sunriseInSecs.second
+    sunriseInSecs += timeZoneLocal
 
-    sunsetInSecs = (jSet - int(jSet)) * (24 * 60 * 60)
+    sunsetInSecs = Astral().sunset_utc(date.today(), lat, long)
+    sunsetInSecs = (sunsetInSecs.hour * 60 + sunsetInSecs.minute) * 60 + sunsetInSecs.second
+    sunsetInSecs += timeZoneLocal
 
     return timedelta(seconds=sunriseInSecs), timedelta(seconds=sunsetInSecs)
 
@@ -105,6 +71,7 @@ def sortWallpapers(l: list[str]) -> list[str]:
     indexList = [int(i.split("_")[-1].split(".")[0]) for i in l]
     indexList.sort()
     sortedList = []
+    #Yes its O(n^2), deal with it
     for i in indexList:
         for j in l:
             if i == int(j.split("_")[-1].split(".")[0]):
@@ -130,7 +97,7 @@ def wallpaperChangingLoop():
         currentTime = getCurrentTime()
         currentIndex = chooseWallpaper(dayIntervals, currentTime)
         print(f"currentTime: {currentTime}, currentIndex: {currentIndex}, previousIndex: {previousIndex}")
-        # Makes sure wallpaper isn't changed constantly
+        #Makes sure wallpaper isn't changed constantly
         if currentIndex != previousIndex:
             changeWallpaper(pathToWallpaper[currentIndex])
             print("Wallpaper changed")
