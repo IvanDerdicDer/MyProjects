@@ -107,7 +107,7 @@ def wallpaperChangingLoop():
 if __name__ == '__main__':
     #Relative path to wallpapers folder
     #In the future should be changed trough a GUI to select wallpaper batch
-    with open("config.conf", "r") as config:
+    with open("config", "r") as config:
         relativePath = config.readline().replace(" ", "").split(":")[1][:-1]
         longitude = int(config.readline().replace(" ", "").split(":")[1])
         latitude = int(config.readline().replace(" ", "").split(":")[1])
