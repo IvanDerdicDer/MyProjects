@@ -55,8 +55,8 @@ def calculateDaytime(lat: float, long: float) -> tuple[timedelta, timedelta]:
 
 def chooseWallpaper(dayIntervals: list[timedelta], currentTime:timedelta) -> int:
     for intervalStart in dayIntervals:
-        if currentTime > intervalStart:
-            return dayIntervals.index(intervalStart)
+        if currentTime < intervalStart:
+            return dayIntervals.index(intervalStart) - 1
     return -1
 
 def sortWallpapers(l: list[str]) -> list[str]:
