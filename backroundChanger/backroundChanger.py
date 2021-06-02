@@ -5,7 +5,7 @@ from time import sleep, localtime, timezone, altzone
 import math
 from astral import Astral
 from scipy.integrate import quad
-#from threading import Thread
+from threading import Thread
 
 def splitDayIntoParts(n: int) -> list[timedelta]:
     sunrise, sunset = calculateDaytime(latitude, longitude)
@@ -55,9 +55,9 @@ def calculateDaytime(lat: float, long: float) -> tuple[timedelta, timedelta]:
 
 def chooseWallpaper(dayIntervals: list[timedelta], currentTime:timedelta) -> int:
     for intervalStart in dayIntervals:
-        if currentTime < intervalStart:
+        if currentTime > intervalStart:
             return dayIntervals.index(intervalStart)
-    return 0
+    return -1
 
 def sortWallpapers(l: list[str]) -> list[str]:
     indexList = [int(i.split("_")[-1].split(".")[0]) for i in l]
@@ -99,14 +99,23 @@ def wallpaperChangingLoop():
 if __name__ == '__main__':
     #Relative path to wallpapers folder
     #In the future should be changed trough a GUI to select wallpaper batch
-    with open("config", "r") as config:
-        relativePath = config.readline().replace(" ", "").split(":")[1][:-1]
-        longitude = int(config.readline().replace(" ", "").split(":")[1])
-        latitude = int(config.readline().replace(" ", "").split(":")[1])
+    previousRelativePath = ""
+    previousLongitude = None
+    previousLatitude = None
 
-    pathToWallpaper, dayIntervals = initialiseRelevantVariables(relativePath)
+    while True:
+        with open("config", "r") as config:
+            relativePath = config.readline().replace(" ", "").split(":")[1][:-1]
+            longitude = int(config.readline().replace(" ", "").split(":")[1])
+            latitude = int(config.readline().replace(" ", "").split(":")[1])
 
-    #Should be run in a new thread when GUI is implemented
-    #wallpaperLoopThread = Thread(target=wallpaperChangingLoop, args=(pathToWallpaper, dayIntervals))
-    #wallpaperLoopThread.start()
-    wallpaperChangingLoop()
+        wallpaperThread = Thread(target=wallpaperChangingLoop)
+        if relativePath != previousRelativePath or longitude != previousLongitude or latitude != previousLatitude:
+            print("Init")
+            pathToWallpaper, dayIntervals = initialiseRelevantVariables(relativePath)
+            if not wallpaperThread.is_alive():
+                wallpaperThread.start()
+            previousLatitude = latitude
+            previousLongitude = longitude
+            previousRelativePath = relativePath
+            sleep(30)
