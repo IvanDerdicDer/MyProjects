@@ -4,39 +4,27 @@ from datetime import timedelta, date
 from time import sleep, localtime, timezone, altzone
 import math
 from astral import Astral
+from scipy.integrate import quad
 #from threading import Thread
 
 def splitDayIntoParts(n: int) -> list[timedelta]:
     sunrise, sunset = calculateDaytime(latitude, longitude)
 
-    midnightToSunrise = []
-    numberOfNightPictures = math.ceil(n / 4)
-    secsFromMidnightToSunrise = sunrise - timedelta(seconds=0)
-    secsFromMidnightToSunrise = secsFromMidnightToSunrise.total_seconds()
-    interval = secsFromMidnightToSunrise / numberOfNightPictures
-    for i in range(1, numberOfNightPictures):
-        midnightToSunrise.append(timedelta(seconds=i*interval))
-    midnightToSunrise.append(sunrise)
+    dayLength = sunset - sunrise
+    dayLength = dayLength.total_seconds()
+    nightLength = 24*60*60 - dayLength
 
-    sunriseToSunset = []
-    numberOfDayPictures = math.floor(n / 2)
-    secsFromSunriseToSunset = sunset - sunrise
-    secsFromSunriseToSunset = secsFromSunriseToSunset.total_seconds()
-    interval = secsFromSunriseToSunset / numberOfDayPictures
-    for i in range(1, numberOfDayPictures):
-        sunriseToSunset.append(sunrise + timedelta(seconds=i*interval))
-    sunriseToSunset.append(sunset)
+    interval = 2.6 / (n/2 - 2)
+    integrationNumbers = [-1.3 + i * interval for i in range(n // 2 - 1)]
+    a = dayLength/(12*60*60)
+    daytimeIntervals = [sunrise + timedelta(seconds=(1 - quad(lambda x: (math.sqrt(a) / math.sqrt(2 * math.pi)) * math.exp(-a*(x**2)/2), integrationNumbers[i], math.inf)[0]) * dayLength) for i in range(len(integrationNumbers))]
+    daytimeIntervals.append(sunset)
 
-    sunsetToMidnight = []
-    numberOfNightPictures = math.floor(n / 4)
-    secsFromSunsetToMidnight = timedelta(days=1) - sunset
-    secsFromSunsetToMidnight = secsFromSunsetToMidnight.total_seconds()
-    interval = secsFromSunsetToMidnight/numberOfNightPictures
-    for i in range(1, numberOfNightPictures):
-        sunsetToMidnight.append(sunset + timedelta(seconds=i*interval))
-    sunsetToMidnight.append(timedelta(days=1))
+    nighttimeIntervals = [sunset + timedelta(seconds=(1 - quad(lambda x: (math.sqrt(a) / math.sqrt(2 * math.pi)) * math.exp(-a*(x**2)/2), integrationNumbers[i], math.inf)[0]) * nightLength) for i in range(len(integrationNumbers))]
+    nighttimeIntervals.append(sunrise)
 
-    toReturn = midnightToSunrise + sunriseToSunset + sunsetToMidnight
+    toReturn = daytimeIntervals + [i - timedelta(days=1) if i.days > 0 else i for i in nighttimeIntervals]
+    toReturn.sort()
 
     return toReturn
 
@@ -66,6 +54,7 @@ def chooseWallpaper(dayIntervals: list[timedelta], currentTime:timedelta) -> int
     for intervalStart in dayIntervals:
         if currentTime < intervalStart:
             return dayIntervals.index(intervalStart)
+    return 0
 
 def sortWallpapers(l: list[str]) -> list[str]:
     indexList = [int(i.split("_")[-1].split(".")[0]) for i in l]
