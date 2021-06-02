@@ -17,10 +17,13 @@ def splitDayIntoParts(n: int) -> list[timedelta]:
     interval = 2.6 / (n/2 - 2)
     integrationNumbers = [-1.3 + i * interval for i in range(n // 2 - 1)]
     a = dayLength/(12*60*60)
-    daytimeIntervals = [sunrise + timedelta(seconds=(1 - quad(lambda x: (math.sqrt(a) / math.sqrt(2 * math.pi)) * math.exp(-a*(x**2)/2), integrationNumbers[i], math.inf)[0]) * dayLength) for i in range(len(integrationNumbers))]
+    modifiedGaussian = lambda x: (math.sqrt(a) / math.sqrt(2 * math.pi)) * math.exp(-a*(x**2)/2)
+    daytimeIntervals = [sunrise + timedelta(seconds=(1 - quad(modifiedGaussian, integrationNumbers[i], math.inf)[0]) * dayLength) for i in range(len(integrationNumbers))]
     daytimeIntervals.append(sunset)
 
-    nighttimeIntervals = [sunset + timedelta(seconds=(1 - quad(lambda x: (math.sqrt(a) / math.sqrt(2 * math.pi)) * math.exp(-a*(x**2)/2), integrationNumbers[i], math.inf)[0]) * nightLength) for i in range(len(integrationNumbers))]
+    a = dayLength / (12 * 60 * 60)
+    modifiedGaussian = lambda x: (math.sqrt(a) / math.sqrt(2 * math.pi)) * math.exp(-a * (x ** 2) / 2)
+    nighttimeIntervals = [sunset + timedelta(seconds=(1 - quad(modifiedGaussian, integrationNumbers[i], math.inf)[0]) * nightLength) for i in range(len(integrationNumbers))]
     nighttimeIntervals.append(sunrise)
 
     toReturn = daytimeIntervals + [i - timedelta(days=1) if i.days > 0 else i for i in nighttimeIntervals]
