@@ -5,7 +5,7 @@ from time import sleep, localtime, timezone, altzone
 import math
 from astral import Astral
 from scipy.integrate import quad
-from threading import Thread
+from threading import Thread, Event
 
 def splitDayIntoParts(n: int) -> list[timedelta]:
     sunrise, sunset = calculateDaytime(latitude, longitude)
@@ -14,16 +14,18 @@ def splitDayIntoParts(n: int) -> list[timedelta]:
     dayLength = dayLength.total_seconds()
     nightLength = 24*60*60 - dayLength
 
-    interval = 2.6 / (n/2 - 2)
-    integrationNumbers = [-1.3 + i * interval for i in range(n // 2 - 1)]
+    interval = 2.6 / (math.floor(n / 2 - 1) if math.floor(n / 2 - 1) != 0 else 1)
+    integrationNumbersDay = [-1.3 + i * interval for i in range(math.floor(n / 2 - 1))]
     a = dayLength/(12*60*60)
     modifiedGaussian = lambda x: (math.sqrt(a) / math.sqrt(2 * math.pi)) * math.exp(-a*(x**2)/2)
-    daytimeIntervals = [sunrise + timedelta(seconds=(1 - quad(modifiedGaussian, integrationNumbers[i], math.inf)[0]) * dayLength) for i in range(len(integrationNumbers))]
+    daytimeIntervals = [sunrise + timedelta(seconds=(1 - quad(modifiedGaussian, integrationNumbersDay[i], math.inf)[0]) * dayLength) for i in range(len(integrationNumbersDay))]
     daytimeIntervals.append(sunset)
 
+    interval = 2.6 / math.ceil(n / 2 - 1)
+    integrationNumbersNight = [-1.3 + i * interval for i in range(math.ceil(n / 2 - 1))]
     a = nightLength / (12 * 60 * 60)
     modifiedGaussian = lambda x: (math.sqrt(a) / math.sqrt(2 * math.pi)) * math.exp(-a * (x ** 2) / 2)
-    nighttimeIntervals = [sunset + timedelta(seconds=(1 - quad(modifiedGaussian, integrationNumbers[i], math.inf)[0]) * nightLength) for i in range(len(integrationNumbers))]
+    nighttimeIntervals = [sunset + timedelta(seconds=(1 - quad(modifiedGaussian, integrationNumbersNight[i], math.inf)[0]) * nightLength) for i in range(len(integrationNumbersNight))]
     nighttimeIntervals.append(sunrise)
 
     toReturn = daytimeIntervals + [i - timedelta(days=1) if i.days > 0 else i for i in nighttimeIntervals]
@@ -82,9 +84,9 @@ def initialiseRelevantVariables(relativePath: str) -> tuple[list[str], list[time
 
     return pathToWallpaper, dayIntervals
 
-def wallpaperChangingLoop():
-    previousIndex = -1
-    while True:
+def wallpaperChangingLoop(killThread: Event):
+    previousIndex = None
+    while True and not killThread.isSet():
         print("Entered loop")
         currentTime = getCurrentTime()
         currentIndex = chooseWallpaper(dayIntervals, currentTime)
@@ -109,11 +111,17 @@ if __name__ == '__main__':
             longitude = int(config.readline().replace(" ", "").split(":")[1])
             latitude = int(config.readline().replace(" ", "").split(":")[1])
 
-        wallpaperThread = Thread(target=wallpaperChangingLoop)
+        killThread = Event()
+        wallpaperThread = Thread(target=wallpaperChangingLoop, args=(killThread,))
         if relativePath != previousRelativePath or longitude != previousLongitude or latitude != previousLatitude:
             print("Init")
             pathToWallpaper, dayIntervals = initialiseRelevantVariables(relativePath)
+
+            if wallpaperThread.is_alive():
+                killThread.set()
+
             if not wallpaperThread.is_alive():
+                killThread.clear()
                 wallpaperThread.start()
             previousLatitude = latitude
             previousLongitude = longitude
