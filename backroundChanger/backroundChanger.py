@@ -21,7 +21,7 @@ def splitDayIntoParts(n: int) -> list[timedelta]:
     daytimeIntervals = [sunrise + timedelta(seconds=(1 - quad(modifiedGaussian, integrationNumbersDay[i], math.inf)[0]) * dayLength) for i in range(len(integrationNumbersDay))]
     daytimeIntervals.append(sunset)
 
-    interval = 2.6 / math.ceil(n / 2 - 1)
+    interval = 2.6 / (math.floor(n / 2 - 1) if math.floor(n / 2 - 1) != 0 else 1)
     integrationNumbersNight = [-1.3 + i * interval for i in range(math.ceil(n / 2 - 1))]
     a = nightLength / (12 * 60 * 60)
     modifiedGaussian = lambda x: (math.sqrt(a) / math.sqrt(2 * math.pi)) * math.exp(-a * (x ** 2) / 2)
