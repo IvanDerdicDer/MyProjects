@@ -6,6 +6,7 @@ import math
 from astral import Astral
 from scipy.integrate import quad
 from threading import Thread, Event
+import json
 
 def splitDayIntoParts(n: int) -> list[timedelta]:
     sunrise, sunset = calculateDaytime(latitude, longitude)
@@ -106,10 +107,11 @@ if __name__ == '__main__':
     previousLatitude = None
 
     while True:
-        with open("config", "r") as config:
-            relativePath = config.readline().replace(" ", "").split(":")[1][:-1]
-            longitude = int(config.readline().replace(" ", "").split(":")[1])
-            latitude = int(config.readline().replace(" ", "").split(":")[1])
+        with open("config.json", "r") as config:
+            configJSON = json.loads(config.read())
+            relativePath = configJSON['relativePath']
+            longitude = configJSON['longitude']
+            latitude = configJSON['latitude']
 
         killThread = Event()
         wallpaperThread = Thread(target=wallpaperChangingLoop, args=(killThread,))
